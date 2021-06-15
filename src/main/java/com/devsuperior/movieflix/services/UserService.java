@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.devsuperior.movieflix.Dto.UserDTO;
 import com.devsuperior.movieflix.entities.User;
+import com.devsuperior.movieflix.exceptions.NotFoundEntity;
 import com.devsuperior.movieflix.repositories.UserRepository;
 
 import javassist.NotFoundException;
@@ -29,9 +30,13 @@ public class UserService implements UserDetailsService {
 		return repository.findAll().stream().map(user -> new UserDTO(user)).collect(Collectors.toList());
 	}
 
-	public UserDTO getUserDTO(Long id) throws NotFoundException {
-		User user = repository.findById(id).orElseThrow(() -> new NotFoundException("User not founded"));
-		return new UserDTO(user);
+	public UserDTO getUserDTO(Long id) {
+		try {
+			User user = repository.findById(id).orElseThrow(() -> new NotFoundException("User not founded"));
+			return new UserDTO(user);
+		} catch (NotFoundException e) {
+			throw new NotFoundEntity("User not found");
+		} 
 	}
 
 	@Override
